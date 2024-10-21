@@ -64,6 +64,20 @@ npm run dev
 
 The rest API is running on [/api](http://localhost:7070/api)
 
+Prisma is used for db management.
+
+Init
+
+```sh
+npx prisma init
+```
+
+Run migrations
+
+```sh
+npx prisma migrate dev --name init
+```
+
 ## Deployment
 
 - This will be deployed in a containerized environment. be it docker based or kubernetes based set up
