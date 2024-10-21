@@ -20,10 +20,7 @@ this diagram depicts initial project entities
 
 ## Bootstrapping the app
 
-Frontend: frontend
-Backend: backend
-
-Set up the right version of node and npm
+Set up the right version of node and npm. Use [nvm](https://github.com/nvm-sh/nvm) for uniformity
 
 ```sh
 nvm install v22.10.0 && nvm use v22.10.0
@@ -41,29 +38,31 @@ $ npm -v
 10.9.0
 ```
 
-Frontend
+Creating the app
 
 ```sh
 npx create-next-app@latest
 ```
 
-Run
+## Running the app
+
+To run the app locally:
+
+Ensure you have the dependencies installed
+
+```sh
+npm i
+```
+
+Then run the dev server
 
 ```sh
 npm run dev
 ```
 
-Backend
+## Rest API
 
-```sh
-npm create hono@latest
-```
-
-Run
-
-```sh
-npm run dev
-```
+The rest API is running on [/api](http://localhost:7070/api)
 
 ## Deployment
 
