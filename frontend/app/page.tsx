@@ -62,7 +62,7 @@ const categories = [
   { id: 5, name: "Health" },
 ];
 
-export default function BlogList() {
+export default function Articles() {
   const [page, setPage] = React.useState(1);
   const [searchTerm, setSearchTerm] = React.useState("");
   const postsPerPage = 3;
@@ -151,7 +151,7 @@ export default function BlogList() {
               <Button
                 size="small"
                 component={Link}
-                href={`/post/${post.id}`}
+                href={`/${post.id}`}
                 variant="outlined"
                 color="primary"
               >
