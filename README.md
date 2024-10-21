@@ -12,6 +12,12 @@ This app is a nextjs frontend with a honojs backend.
 - Optionally list my articles (from me or favourites)
 - While logged in I can comment or favourite on an article
 
+## Scope diagram
+
+this diagram depicts initial project entities
+
+![project scope](./docs/doblog-features.svg)
+
 ## Bootstrapping the app
 
 Frontend: frontend
