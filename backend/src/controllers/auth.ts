@@ -30,6 +30,7 @@ export const register = async (c) => {
       userId: user.id,
     });
   } catch (error) {
+    console.log(`failed to register: ${error.message}`);
     c.status(500);
     return c.json({ error: "Internal server error" });
   }
@@ -38,8 +39,6 @@ export const register = async (c) => {
 export const login = async (c) => {
   try {
     const { email, password } = await c.req.json();
-
-    console.log(`logging in with: ${email}`);
 
     const user = await prisma.user.findUnique({
       where: { email },
@@ -59,7 +58,7 @@ export const login = async (c) => {
     const token = jwt.sign({ userId: user.id, email }, env.JWT_SECRET);
     return c.json({ token, user });
   } catch (error: any) {
-    console.log(`failed to log in: ${error.message}`);
+    console.error(`failed to log in: ${error.message}`);
     c.status(500);
     return c.json({ error: "Internal server error" });
   }

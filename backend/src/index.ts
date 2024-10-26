@@ -1,9 +1,14 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import authRoutes from "./routes/auth";
-import { auth } from "./middleware/auth";
+import { auth } from "./middleware/auth.js";
+import { logger } from "hono/logger";
+import { cors } from "hono/cors";
 
 const app = new Hono();
+
+app.use("*", logger());
+app.use("*", cors());
 
 app.route("/auth", authRoutes);
 
