@@ -64,11 +64,43 @@ npm run dev
 
 The rest API is running on [/api](http://localhost:7069)
 
+For db management, prisma is used.
+
 ```sh
 npx prisma init
 
 npx prisma migrate dev --name init
 ```
+
+### Database
+
+The backend stores data in a postgres database. Checkout the [prisma schema](./backend/prisma/schema.prisma) for the db schema.
+
+We use [docker compose](./compose.yml) for easily managing postgres.
+
+```sh
+docker compose up -d
+```
+
+Or use the Makefile command
+
+```sh
+make up
+```
+
+Inspect
+
+```sh
+$ make ps
+
+docker compose ps
+NAME                IMAGE                COMMAND                  SERVICE    CREATED       STATUS       PORTS
+doblog-postgres-1   postgres:17-alpine   "docker-entrypoint.s…"   postgres   3 hours ago   Up 3 hours   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp
+```
+
+### Testing and working with the API
+
+Checkout the [client.http](./client.http) file for http requests and their parameters. This works with [vscode rest client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client).
 
 ## Deployment
 
