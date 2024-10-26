@@ -1,0 +1,35 @@
+@baseUrl=http://127.0.0.1:7069
+
+### Get Healthz
+GET {{baseUrl}}/healthz HTTP/1.1
+Accept: application/json
+
+### Register user
+POST {{baseUrl}}/register HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Test User",
+    "email": "test@gmail.com",
+    "password": "Test@123$",
+    "password_confirm": "Test@123$"
+}
+
+### Login
+# @name userLogin
+POST {{baseUrl}}/login HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "admin@citizix.com",
+    "password": "Admin@123$"
+}
+
+@authToken={{userLogin.response.headers.X-Auth-Token}}
+
+### Logout
+DELETE {{baseUrl}}/auth/logout HTTP/1.1
+X-Auth-Token: {{authToken}}
+Accept: application/json
