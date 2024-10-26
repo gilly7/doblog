@@ -1,11 +1,15 @@
 import { Hono } from "hono";
-import { register, login, verify } from "../controllers/auth";
-import { auth } from "../middleware/auth";
+import { register, login, me, users, logout } from "../controllers/auth";
+import { auth, validateSession } from "../middleware/auth";
 
 const router = new Hono();
 
 router.post("/register", register);
 router.post("/login", login);
-router.get("/verify", auth, verify);
+
+router.get("/me", auth, me);
+
+router.post("/logout", validateSession, logout);
+router.get("/users", validateSession, users);
 
 export default router;

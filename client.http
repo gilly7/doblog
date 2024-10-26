@@ -34,12 +34,32 @@ Accept: application/json
 ### Save auth token
 @authToken={{userLogin.response.body.token}}
 
-### Verify
-GET {{baseUrl}}/auth/verify HTTP/1.1
+### Get Users
+GET {{baseUrl}}/auth/users HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Protected
 GET {{baseUrl}}/protected HTTP/1.1
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### Create Article
+POST {{baseUrl}}/articles HTTP/1.1
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+{
+    "title": "Test Article 2",
+     "content": "Test Article Body two"
+}
+
+### Get Articles
+GET {{baseUrl}}/articles HTTP/1.1
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### Get Article
+GET {{baseUrl}}/articles/8c048069-be0c-4f22-8926-26f82677c97f HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
