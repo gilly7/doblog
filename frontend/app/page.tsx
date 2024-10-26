@@ -151,7 +151,7 @@ export default function Articles() {
               <Button
                 size="small"
                 component={Link}
-                href={`/${post.id}`}
+                href={`/articles/${post.id}`}
                 variant="outlined"
                 color="primary"
               >
