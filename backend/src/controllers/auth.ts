@@ -1,7 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import prisma from "../db/client.ts";
+import prisma from "../db/client";
 import { env } from "../config/env";
+import { JWTPayload } from "../types/index";
 
 export const register = async (c) => {
   try {
@@ -55,7 +56,21 @@ export const login = async (c) => {
       return c.json({ error: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ userId: user.id, email }, env.JWT_SECRET);
+    const token = jwt.sign(
+      { userId: user.id, email } as JWTPayload,
+      env.JWT_SECRET
+    );
+
+    const expiresAt = new Date(Date.now() + env.SESSION_DURATION);
+
+    await prisma.session.create({
+      data: {
+        token,
+        userId: user.id,
+        expiresAt,
+      },
+    });
+
     return c.json({ token, user });
   } catch (error: any) {
     console.error(`failed to log in: ${error.message}`);
@@ -64,15 +79,41 @@ export const login = async (c) => {
   }
 };
 
-export const verify = async (c) => {
-  const payload = c.get("jwtPayload");
+export const me = async (c) => {
+  const payload = c.get("jwtPayload") as JWTPayload;
   const user = await prisma.user.findUnique({
     where: { id: payload.userId },
     select: { id: true, name: true, email: true, createdAt: true },
   });
 
   return c.json({
-    message: "Token is valid",
     user,
+  });
+};
+
+export const logout = async (c) => {
+  try {
+    const token = c.req.header("Authorization")?.split(" ")[1];
+
+    if (token) {
+      await prisma.session.delete({
+        where: { token },
+      });
+    }
+
+    return c.json({ message: "Logged out successfully" });
+  } catch (error) {
+    c.status(500);
+    return c.json({ error: "Internal server error" });
+  }
+};
+
+export const users = async (c) => {
+  const users = await prisma.user.findMany({
+    select: { id: true, name: true, email: true, createdAt: true },
+  });
+
+  return c.json({
+    users,
   });
 };
