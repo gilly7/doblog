@@ -1,0 +1,19 @@
+{
+  "name": "backend",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.2",
+    "@prisma/client": "^5.21.1",
+    "bcryptjs": "^2.4.3",
+    "hono": "^4.6.7",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "prisma": "^5.21.1",
+    "tsx": "^4.7.1"
+  }
+}

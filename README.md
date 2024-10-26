@@ -60,9 +60,15 @@ Then run the dev server
 npm run dev
 ```
 
-## Rest API
+## Backend
 
-The rest API is running on [/api](http://localhost:7070/api)
+The rest API is running on [/api](http://localhost:7069)
+
+```sh
+npx prisma init
+
+npx prisma migrate dev --name init
+```
 
 ## Deployment
 
