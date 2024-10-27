@@ -16,6 +16,11 @@ export interface ArticleInput {
   published?: boolean;
 }
 
+export interface CategoryInput {
+  name: string;
+  description?: string;
+}
+
 export interface CommentInput {
   content: string;
 }

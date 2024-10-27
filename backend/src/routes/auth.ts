@@ -9,7 +9,7 @@ router.post("/login", login);
 
 router.get("/me", auth, me);
 
-router.post("/logout", validateSession, logout);
+router.delete("/logout", validateSession, logout);
 router.get("/users", validateSession, users);
 
 export default router;

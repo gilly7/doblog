@@ -24,14 +24,22 @@ export default function AppHeader() {
           </Link>
         </Typography>
         {session ? (
-          <Button
-            color="inherit"
-            onClick={() => {
-              signOut();
-            }}
-          >
-            Logout
-          </Button>
+          <>
+            <Button color="inherit" component={Link} href="/categories/new">
+              Add Category
+            </Button>
+            <Button color="inherit" component={Link} href="/articles/new">
+              Write Article
+            </Button>
+            <Button
+              color="inherit"
+              onClick={() => {
+                signOut();
+              }}
+            >
+              Logout
+            </Button>
+          </>
         ) : (
           <>
             <Button color="inherit" component={Link} href="/login">
