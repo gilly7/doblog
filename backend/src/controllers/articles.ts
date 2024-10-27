@@ -1,5 +1,5 @@
 import prisma from "../db/client";
-import { ArticleInput, JWTPayload } from "../types/index";
+import { ArticleInput } from "../types/index";
 
 export const createArticle = async (c) => {
   try {
@@ -49,25 +49,61 @@ export const createArticle = async (c) => {
 
 export const getArticles = async (c) => {
   try {
-    const articles = await prisma.article.findMany({
-      where: { published: true },
-      include: {
-        author: {
-          select: { id: true, name: true, email: true },
-        },
-        category: {
-          select: { id: true, name: true },
-        },
-        _count: {
-          select: { comments: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    const page = parseInt(c.req.query("page") || "1", 10);
+    const limit = parseInt(c.req.query("limit") || "10", 10);
+    const categoryId = c.req.query("categoryId");
+    const searchTerm = c.req.query("search");
 
-    return c.json(articles);
-  } catch (error) {
-    console.log(`failed to get articles: ${error.message}`);
+    const skip = (page - 1) * limit;
+
+    let whereClause: any = { published: true };
+
+    if (categoryId) {
+      whereClause.categoryId = categoryId;
+    }
+
+    if (searchTerm) {
+      whereClause.OR = [
+        { title: { contains: searchTerm, mode: "insensitive" } },
+        { content: { contains: searchTerm, mode: "insensitive" } },
+      ];
+    }
+
+    const [articles, totalCount] = await Promise.all([
+      prisma.article.findMany({
+        where: whereClause,
+        include: {
+          author: {
+            select: { id: true, name: true, email: true },
+          },
+          category: {
+            select: { id: true, name: true },
+          },
+          _count: {
+            select: { comments: true },
+          },
+        },
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.article.count({ where: whereClause }),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return c.json({
+      articles,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    });
+  } catch (error: any) {
+    console.error(`Failed to fetch articles: ${error.message}`);
     c.status(500);
     return c.json({ error: "Internal server error" });
   }

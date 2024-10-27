@@ -60,8 +60,8 @@ Authorization: Bearer {{authToken}}
 Accept: application/json
 
 {
-    "title": "Test Article 5",
-    "content": "Test Article Body Five",
+    "title": "Test Article 8",
+    "content": "Test Article Body eight",
     "categoryId": "6c410465-dc49-4b4c-bc01-306b3ef12cd8"
 }
 

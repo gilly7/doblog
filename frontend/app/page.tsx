@@ -24,15 +24,32 @@ import { getArticles, getCategories } from "./lib/api";
 export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    getArticles().then(setArticles);
-    getCategories().then(setCategories);
-  }, []);
-
+  const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const articlesPerPage = 5;
+  const [loading, setLoading] = useState(true);
+
+  const fetchArticles = async () => {
+    setLoading(true);
+    try {
+      const response = await getArticles({
+        page,
+        limit: 5,
+        search: searchTerm,
+      });
+      setArticles(response.articles);
+      setTotalPages(response.pagination.totalPages);
+    } catch (error) {
+      console.error("Failed to fetch articles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchArticles();
+    getCategories().then(setCategories);
+  }, []);
 
   const handleChangePage = (
     event: React.ChangeEvent<unknown>,
@@ -42,20 +59,15 @@ export default function Home() {
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(`searching ${event.target.value}`);
     setSearchTerm(event.target.value);
     setPage(1);
   };
 
-  const filteredArticles = articles.filter(
-    (post) =>
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const displayedArticles = filteredArticles.slice(
-    (page - 1) * articlesPerPage,
-    page * articlesPerPage
-  );
+  const truncateContent = (content: string, maxLength: number = 150) => {
+    if (content.length <= maxLength) return content;
+    return content.substr(0, content.lastIndexOf(" ", maxLength)) + "...";
+  };
 
   return (
     <Grid container spacing={4}>
@@ -92,43 +104,49 @@ export default function Home() {
         <Typography variant="h4" component="h1" gutterBottom color="primary">
           Latest Blog Posts
         </Typography>
-        {displayedArticles.map((article) => (
-          <Card key={article.id} sx={{ mb: 4, borderColor: "primary.main" }}>
-            <CardContent>
-              <Typography
-                variant="h5"
-                component="div"
-                gutterBottom
-                color="primary"
-              >
-                {article.title}
-              </Typography>
-              <Typography
-                variant="subtitle2"
-                color="text.secondary"
-                gutterBottom
-              >
-                {article.createdAt}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {article.content}
-              </Typography>
-            </CardContent>
-            <CardActions>
-              <Button
-                size="small"
-                component={Link}
-                href={`/articles/${article.id}`}
-                variant="outlined"
-                color="primary"
-              >
-                Read More
-              </Button>
-            </CardActions>
-          </Card>
-        ))}
+        {loading ? (
+          <Typography>Loading...</Typography>
+        ) : (
+          articles.map((article) => (
+            <Card key={article.id} sx={{ mb: 4, borderColor: "primary.main" }}>
+              <CardContent>
+                <Typography
+                  variant="h5"
+                  component="div"
+                  gutterBottom
+                  color="primary"
+                >
+                  {article.title}
+                </Typography>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  gutterBottom
+                >
+                  {new Date(article.createdAt).toLocaleDateString()} | Comments:
+                  ({article._count?.comments || 0}) | Category:
+                  {article.category.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {truncateContent(article.content)}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button
+                  size="small"
+                  component={Link}
+                  href={`/articles/${article.id}`}
+                  variant="outlined"
+                  color="primary"
+                >
+                  Read More
+                </Button>
+              </CardActions>
+            </Card>
+          ))
+        )}
         <Pagination
-          count={Math.ceil(filteredArticles.length / articlesPerPage)}
+          count={totalPages}
           page={page}
           onChange={handleChangePage}
           sx={{ mt: 4, display: "flex", justifyContent: "center" }}
