@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
   Alert,
   Typography,
@@ -12,26 +11,25 @@ import {
   Box,
 } from "@mui/material";
 import { z } from "zod";
+import { createCategory } from "../../lib/api";
 
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+const categorySchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type CategoryFormData = z.infer<typeof categorySchema>;
 
-const useLoginForm = () => {
-  const [formData, setFormData] = useState<LoginFormData>({
-    email: "",
-    password: "",
+const useArticleForm = () => {
+  const [formData, setFormData] = useState<CategoryFormData>({
+    name: "",
+    description: "",
   });
-  const [errors, setErrors] = useState<Partial<LoginFormData>>({});
+  const [errors, setErrors] = useState<Partial<CategoryFormData>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState("");
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,32 +44,18 @@ const useLoginForm = () => {
     setIsLoading(true);
 
     try {
-      loginSchema.parse(formData);
+      categorySchema.parse(formData);
 
-      const result = await signIn("credentials", {
-        redirect: false,
-        email: formData.email,
-        password: formData.password,
+      const category = await createCategory({
+        ...formData,
       });
 
-      if (result?.error) {
-        const errorMessages: Record<string, string> = {
-          CredentialsSignin: "Invalid email or password",
-          Configuration: "There's an issue with the server configuration",
-          Default: "An unexpected error occurred",
-        };
-
-        setGeneralError(
-          errorMessages[result.error] || `Login failed: ${result.error}`
-        );
-        console.error("Login error:", result.error);
-      } else {
-        router.push(callbackUrl);
-        router.refresh();
-      }
+      //  toast.success("category created successfully");
+      router.push(`/categories/${category.id}`);
     } catch (err) {
+      // toast.error("Failed to create category");
       if (err instanceof z.ZodError) {
-        setErrors(err.flatten().fieldErrors as Partial<LoginFormData>);
+        setErrors(err.flatten().fieldErrors as Partial<CategoryFormData>);
       } else {
         setGeneralError("An unexpected error occurred");
         console.error("Unexpected error:", err);
@@ -91,7 +75,7 @@ const useLoginForm = () => {
   };
 };
 
-export default function Login() {
+export default function NewCategory() {
   const {
     formData,
     errors,
@@ -99,7 +83,7 @@ export default function Login() {
     generalError,
     handleChange,
     handleSubmit,
-  } = useLoginForm();
+  } = useArticleForm();
 
   return (
     <Box
@@ -110,9 +94,9 @@ export default function Login() {
         minHeight: "calc(100vh - 200px)",
       }}
     >
-      <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 500 }}>
+      <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 700 }}>
         <Typography variant="h4" component="h1" gutterBottom align="center">
-          Login
+          Add Category
         </Typography>
         {generalError && (
           <Alert severity="error" sx={{ mt: 2, width: "100%" }}>
@@ -122,27 +106,28 @@ export default function Login() {
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             fullWidth
-            label="Email"
+            label="Name"
             variant="outlined"
             margin="normal"
-            type="email"
-            name="email"
-            value={formData.email}
+            type="text"
+            name="name"
+            value={formData.name}
             onChange={handleChange}
-            error={!!errors.email}
-            helperText={errors.email}
+            error={!!errors.name}
+            helperText={errors.name}
           />
           <TextField
             fullWidth
-            label="Password"
-            type="password"
-            name="password"
+            label="Description"
+            name="description"
             variant="outlined"
             margin="normal"
-            value={formData.password}
+            multiline
+            rows={5}
+            value={formData.description}
             onChange={handleChange}
-            error={!!errors.password}
-            helperText={errors.password}
+            error={!!errors.description}
+            helperText={errors.description}
           />
           <Button
             type="submit"
@@ -152,7 +137,7 @@ export default function Login() {
             sx={{ mt: 2 }}
             disabled={isLoading}
           >
-            {isLoading ? "Signing in..." : "Sign In"}
+            {isLoading ? "Creating..." : "Create Category"}
           </Button>
         </Box>
       </Paper>

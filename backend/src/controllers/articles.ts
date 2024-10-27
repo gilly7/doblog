@@ -3,23 +3,38 @@ import { ArticleInput, JWTPayload } from "../types/index";
 
 export const createArticle = async (c) => {
   try {
-    const payload = c.get("jwtPayload") as JWTPayload;
+    const user = c.get("user");
+
     const {
       title,
       content,
       published = true,
+      categoryId,
     }: ArticleInput = await c.req.json();
+
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+
+    if (!category) {
+      c.status(404);
+      return c.json({ error: "Category not found" });
+    }
 
     const article = await prisma.article.create({
       data: {
         title,
         content,
         published,
-        authorId: payload.userId,
+        authorId: user.id,
+        categoryId,
       },
       include: {
         author: {
-          select: { name: true, email: true },
+          select: { id: true, name: true, email: true },
+        },
+        category: {
+          select: { id: true, name: true },
         },
       },
     });
@@ -38,7 +53,10 @@ export const getArticles = async (c) => {
       where: { published: true },
       include: {
         author: {
-          select: { name: true, email: true },
+          select: { id: true, name: true, email: true },
+        },
+        category: {
+          select: { id: true, name: true },
         },
         _count: {
           select: { comments: true },
@@ -64,10 +82,13 @@ export const getArticle = async (c) => {
         author: {
           select: { name: true, email: true },
         },
+        category: {
+          select: { id: true, name: true },
+        },
         comments: {
           include: {
             author: {
-              select: { name: true, email: true },
+              select: { id: true, name: true, email: true },
             },
           },
         },
@@ -90,8 +111,14 @@ export const getArticle = async (c) => {
 export const updateArticle = async (c) => {
   try {
     const id = c.req.param("id");
-    const payload = c.get("jwtPayload") as JWTPayload;
-    const { title, content, published }: ArticleInput = await c.req.json();
+    const user = c.get("user");
+
+    const {
+      title,
+      content,
+      published = true,
+      categoryId,
+    }: ArticleInput = await c.req.json();
 
     const article = await prisma.article.findUnique({
       where: { id },
@@ -102,9 +129,20 @@ export const updateArticle = async (c) => {
       return c.json({ error: "Article not found" });
     }
 
-    if (article.authorId !== payload.userId) {
+    if (article.authorId !== user.id) {
       c.status(403);
       return c.json({ error: "Unauthorized" });
+    }
+
+    if (categoryId && categoryId !== article.categoryId) {
+      const category = await prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+
+      if (!category) {
+        c.status(404);
+        return c.json({ error: "Category not found" });
+      }
     }
 
     const updatedArticle = await prisma.article.update({
@@ -128,7 +166,7 @@ export const updateArticle = async (c) => {
 export const deleteArticle = async (c) => {
   try {
     const id = c.req.param("id");
-    const payload = c.get("jwtPayload") as JWTPayload;
+    const user = c.get("user");
 
     const article = await prisma.article.findUnique({
       where: { id },
@@ -139,7 +177,7 @@ export const deleteArticle = async (c) => {
       return c.json({ error: "Article not found" });
     }
 
-    if (article.authorId !== payload.userId) {
+    if (article.authorId !== user.id) {
       c.status(403);
       return c.json({ error: "Unauthorized" });
     }

@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+const publicRoutes = ["/", "/login", "/register", "/categories"];
+const protectedRoutes = ["/articles/new", "/categories/new"];
+
 export async function middleware(req: NextRequest) {
   const token = await getToken({
     req,
@@ -14,21 +17,30 @@ export async function middleware(req: NextRequest) {
 
   const isAuthenticated = !!token;
 
-  const isPublicPage =
-    req.nextUrl.pathname.startsWith("/auth") || req.nextUrl.pathname === "/";
-  const isDashboardPage = req.nextUrl.pathname.startsWith("/dash");
+  const { pathname } = req.nextUrl;
 
-  if (isAuthenticated && isPublicPage) {
-    return NextResponse.redirect(new URL("/dash", req.url));
+  if (publicRoutes.includes(pathname)) {
+    return NextResponse.next();
   }
 
-  if (!isAuthenticated && isDashboardPage) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+  // Allow /articles/<uuid> but not /articles/new
+  if (pathname.match(/^\/articles\/(?!new$)[a-f0-9-]+$/i)) {
+    return NextResponse.next();
+  }
+
+  // Allow /categories/<uuid> but not /categories/new
+  if (pathname.match(/^\/categories\/(?!new$)[a-f0-9-]+$/i)) {
+    return NextResponse.next();
+  }
+
+  // Check if the route is protected
+  if (protectedRoutes.includes(pathname) || !isAuthenticated) {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/auth/:path*", "/dash/:path*"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

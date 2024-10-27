@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState } from "react";
 import {
   Typography,
   Grid,
@@ -8,31 +8,25 @@ import {
   CardContent,
   CardActions,
   Button,
-  List,
-  ListItem,
-  ListItemText,
   Pagination,
-  Divider,
   TextField,
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Link from "next/link";
-import { Article, Category } from "./types";
-import { getArticles, getCategories } from "./lib/api";
+import { Category } from "@/types";
+import { getCategories } from "@/lib/api";
 
 export default function Home() {
-  const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    getArticles().then(setArticles);
     getCategories().then(setCategories);
   }, []);
 
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const articlesPerPage = 5;
+  const categoriesPerPage = 5;
 
   const handleChangePage = (
     event: React.ChangeEvent<unknown>,
@@ -46,15 +40,15 @@ export default function Home() {
     setPage(1);
   };
 
-  const filteredArticles = articles.filter(
-    (post) =>
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCategories = categories.filter(
+    (category) =>
+      category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const displayedArticles = filteredArticles.slice(
-    (page - 1) * articlesPerPage,
-    page * articlesPerPage
+  const displayedCategories = filteredCategories.slice(
+    (page - 1) * categoriesPerPage,
+    page * categoriesPerPage
   );
 
   return (
@@ -90,10 +84,10 @@ export default function Home() {
       </Grid>
       <Grid item xs={12} md={8}>
         <Typography variant="h4" component="h1" gutterBottom color="primary">
-          Latest Blog Posts
+          Categories
         </Typography>
-        {displayedArticles.map((article) => (
-          <Card key={article.id} sx={{ mb: 4, borderColor: "primary.main" }}>
+        {displayedCategories.map((category) => (
+          <Card key={category.id} sx={{ mb: 4, borderColor: "primary.main" }}>
             <CardContent>
               <Typography
                 variant="h5"
@@ -101,34 +95,34 @@ export default function Home() {
                 gutterBottom
                 color="primary"
               >
-                {article.title}
+                {category.name}
               </Typography>
               <Typography
                 variant="subtitle2"
                 color="text.secondary"
                 gutterBottom
               >
-                {article.createdAt}
+                {category.createdAt}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {article.content}
+                {category.description}
               </Typography>
             </CardContent>
             <CardActions>
               <Button
                 size="small"
                 component={Link}
-                href={`/articles/${article.id}`}
+                href={`/categories/${category.id}`}
                 variant="outlined"
                 color="primary"
               >
-                Read More
+                Details
               </Button>
             </CardActions>
           </Card>
         ))}
         <Pagination
-          count={Math.ceil(filteredArticles.length / articlesPerPage)}
+          count={Math.ceil(filteredCategories.length / categoriesPerPage)}
           page={page}
           onChange={handleChangePage}
           sx={{ mt: 4, display: "flex", justifyContent: "center" }}
@@ -137,30 +131,7 @@ export default function Home() {
       </Grid>
       <Grid item xs={12} md={4}>
         <Card sx={{ borderColor: "primary.main" }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom color="primary">
-              Categories
-            </Typography>
-            <List>
-              {categories.map((category, index) => (
-                <Fragment key={category.id}>
-                  <ListItem
-                    button
-                    component={Link}
-                    href={`/category/${category.id}`}
-                  >
-                    <ListItemText
-                      primary={category.name}
-                      sx={{ color: "text.primary" }}
-                    />
-                  </ListItem>
-                  {index !== categories.length - 1 && (
-                    <Divider sx={{ borderColor: "primary.main" }} />
-                  )}
-                </Fragment>
-              ))}
-            </List>
-          </CardContent>
+          <CardContent></CardContent>
         </Card>
       </Grid>
     </Grid>

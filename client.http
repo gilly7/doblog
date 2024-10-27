@@ -39,6 +39,16 @@ GET {{baseUrl}}/auth/users HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
+### Me
+GET {{baseUrl}}/auth/me HTTP/1.1
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### logout
+DELETE {{baseUrl}}/auth/logout HTTP/1.1
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
 ### Protected
 GET {{baseUrl}}/protected HTTP/1.1
 Authorization: Bearer {{authToken}}
@@ -50,16 +60,53 @@ Authorization: Bearer {{authToken}}
 Accept: application/json
 
 {
-    "title": "Test Article 2",
-     "content": "Test Article Body two"
+    "title": "Test Article 5",
+    "content": "Test Article Body Five",
+    "categoryId": "6c410465-dc49-4b4c-bc01-306b3ef12cd8"
 }
 
 ### Get Articles
 GET {{baseUrl}}/articles HTTP/1.1
-Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Get Article
 GET {{baseUrl}}/articles/8c048069-be0c-4f22-8926-26f82677c97f HTTP/1.1
+Accept: application/json
+
+### Update Article
+PUT {{baseUrl}}/articles/8c048069-be0c-4f22-8926-26f82677c97f HTTP/1.1
 Authorization: Bearer {{authToken}}
+Accept: application/json
+
+{
+    "title": "Test Article updated",
+     "content": "Test Article Body updated"
+}
+
+### Create Article Comment
+POST {{baseUrl}}/articles/8c048069-be0c-4f22-8926-26f82677c97f/comments HTTP/1.1
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+{
+     "content": "Final dummy one!"
+}
+
+### Create Article Comment
+DELETE {{baseUrl}}/articles/comments/45ffe5a4-d0e5-4fd1-bef4-d0d525b81824 HTTP/1.1
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### Create Category
+POST {{baseUrl}}/categories HTTP/1.1
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+{
+    "name": "Politics",
+    "description": "All about politics"
+}
+
+### Get Categories
+GET {{baseUrl}}/categories HTTP/1.1
 Accept: application/json

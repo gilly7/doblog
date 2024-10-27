@@ -1,8 +1,9 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import authRoutes from "./routes/auth";
-import articleRoutes from "./routes/articles";
-import { auth } from "./middleware/auth";
+import authRoutes from "./routes/auth.js";
+import articleRoutes from "./routes/articles.js";
+import categoryRoutes from "./routes/categories.js";
+import { auth } from "./middleware/auth.js";
 import { logger } from "hono/logger";
 import { cors } from "hono/cors";
 
@@ -13,6 +14,7 @@ app.use("*", cors());
 
 app.route("/auth", authRoutes);
 app.route("/articles", articleRoutes);
+app.route("/categories", categoryRoutes);
 
 app.get("/protected", auth, (c) => {
   const user = c.get("jwtPayload");
