@@ -45,8 +45,18 @@ export const verifyToken = async (token: string) => {
   });
 };
 
-export const getArticles = async () => {
-  return fetchWithAuth("/articles");
+export const getArticles = async ({
+  page,
+  limit,
+  search,
+}: {
+  page?: number;
+  limit?: number;
+  search?: string;
+}) => {
+  return fetchWithAuth(
+    `/articles?page=${page}&limit=${limit}&search=${search}`
+  );
 };
 
 export const getArticle = async (id: string) => {
