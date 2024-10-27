@@ -118,8 +118,8 @@ export default function NewCategory() {
           />
           <TextField
             fullWidth
-            label="Content"
-            name="content"
+            label="Description"
+            name="description"
             variant="outlined"
             margin="normal"
             multiline

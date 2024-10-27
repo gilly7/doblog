@@ -111,7 +111,7 @@ export default function Register() {
         minHeight: "calc(100vh - 200px)",
       }}
     >
-      <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 400 }}>
+      <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 500 }}>
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Register
         </Typography>

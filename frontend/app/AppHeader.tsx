@@ -23,6 +23,9 @@ export default function AppHeader() {
             DuBlog
           </Link>
         </Typography>
+        <Button color="inherit" component={Link} href="/categories">
+          Categories
+        </Button>
         {session ? (
           <>
             <Button color="inherit" component={Link} href="/categories/new">
@@ -33,8 +36,8 @@ export default function AppHeader() {
             </Button>
             <Button
               color="inherit"
-              onClick={() => {
-                signOut();
+              onClick={async () => {
+                await signOut({ redirect: false });
               }}
             >
               Logout

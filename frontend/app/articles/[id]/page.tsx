@@ -60,6 +60,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
       await createComment(id as string, formData.content);
       const updatedArticle = await getArticle(id as string);
       setArticle(updatedArticle);
+      setFormData({ content: "" });
       //  toast.success("Comment added successfully");
     } catch (err) {
       // toast.error("Failed to create article");
@@ -121,6 +122,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
               variant="outlined"
               placeholder="Write your comment here..."
               sx={{ mb: 2 }}
+              name="content"
               value={formData.content}
               onChange={handleChange}
               error={!!errors.content}

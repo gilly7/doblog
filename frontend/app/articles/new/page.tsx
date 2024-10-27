@@ -54,9 +54,9 @@ const useArticleForm = () => {
     (event: SelectChangeEvent<string>) => {
       setFormData((prevState) => ({
         ...prevState,
-        sender_id: event.target.value,
+        categoryId: event.target.value,
       }));
-      setErrors((prevErrors) => ({ ...prevErrors, sender_id: undefined }));
+      setErrors((prevErrors) => ({ ...prevErrors, categoryId: undefined }));
     },
     []
   );
@@ -123,7 +123,7 @@ export default function NewArticle() {
         minHeight: "calc(100vh - 200px)",
       }}
     >
-      <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 700 }}>
+      <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 900 }}>
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Add Article
         </Typography>
@@ -146,7 +146,7 @@ export default function NewArticle() {
             helperText={errors.title}
           />
           <FormControl fullWidth margin="normal" error={!!errors.categoryId}>
-            <InputLabel id="category-label">Sender ID</InputLabel>
+            <InputLabel id="category-label">Category</InputLabel>
             <Select
               labelId="category-label"
               id="category"
@@ -174,7 +174,7 @@ export default function NewArticle() {
             variant="outlined"
             margin="normal"
             multiline
-            rows={5}
+            rows={7}
             value={formData.content}
             onChange={handleChange}
             error={!!errors.content}
