@@ -12,11 +12,20 @@ import {
   List,
   ListItem,
   ListItemText,
+  IconButton,
 } from "@mui/material";
-import { createComment, getArticle } from "../../lib/api";
-import { Article } from "@/types";
+import {
+  createComment,
+  deleteArticle,
+  deleteComment,
+  getArticle,
+} from "../../lib/api";
+import { Article, Comment } from "@/types";
 import { useSession } from "next-auth/react";
 import { z } from "zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 
 const commentSchema = z.object({
   content: z.string().min(1, "Content is required"),
@@ -32,6 +41,10 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   const [formData, setFormData] = useState<CommentFormData>({
     content: "",
   });
+
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const { data: session } = useSession();
   const { id } = params;
@@ -75,13 +88,59 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
     }
   };
 
+  const handleDeleteArticle = async () => {
+    if (window.confirm("Are you sure you want to delete this article?")) {
+      try {
+        await deleteArticle(id);
+        router.push("/");
+        // toast.success("Article deleted successfully");
+      } catch (err) {
+        // toast.error("Failed to delete article");
+        console.error("Error deleting article:", err);
+      }
+    }
+  };
+
+  const handleEditComment = (comment: Comment) => {
+    setFormData({ content: comment.content });
+    setEditingCommentId(comment.id);
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (window.confirm("Are you sure you want to delete this comment?")) {
+      try {
+        await deleteComment(commentId);
+        const updatedArticle = await getArticle(id as string);
+        setArticle(updatedArticle);
+        // toast.success("Comment deleted successfully");
+      } catch (err) {
+        // toast.error("Failed to delete comment");
+        console.error("Error deleting comment:", err);
+      }
+    }
+  };
+
   if (!article) return <div>Loading...</div>;
+
+  const userOwnsArticle = session && article.author.id === session.user?.id;
 
   return (
     <Box>
       <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h2" component="h1" gutterBottom>
           {article.title}
+        </Typography>
+        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+          {new Date(article.createdAt).toLocaleDateString()} | Comments: (
+          {article._count?.comments || 0}) | Category: {article.category.name}
+          {userOwnsArticle && (
+            <>
+              | <Link href={`/articles/edit/${article.id}`}>Edit</Link>|{" "}
+              <Link href="#" onClick={handleDeleteArticle}>
+                Delete
+              </Link>
+            </>
+          )}
         </Typography>
         <Typography variant="body1" paragraph>
           {article.content}
@@ -93,7 +152,30 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
       </Typography>
       <List>
         {article.comments?.map((comment) => (
-          <ListItem key={comment.id}>
+          <ListItem
+            key={comment.id}
+            secondaryAction={
+              session &&
+              comment.author.id === session.user?.id && (
+                <>
+                  <IconButton
+                    edge="end"
+                    aria-label="edit"
+                    onClick={() => handleEditComment(comment)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => handleDeleteComment(comment.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </>
+              )
+            }
+          >
             <ListItemText
               primary={comment.author?.name}
               secondary={comment.content}
@@ -105,7 +187,6 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
       {session && (
         <>
           <Divider sx={{ my: 3 }} />
-
           <Typography variant="h5" component="h3" gutterBottom>
             Add a Comment
           </Typography>

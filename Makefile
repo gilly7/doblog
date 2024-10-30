@@ -9,3 +9,6 @@ stop:
 
 rm: stop
 	docker compose rm -f
+
+logs:
+	docker compose logs -f

@@ -39,7 +39,7 @@ export interface Comment {
   content: string;
   createdAt: string;
   author: {
-    d: string;
+    id: string;
     name: string;
   };
 }
