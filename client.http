@@ -27,8 +27,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-    "email": "test@gmail.com",
-    "password": "Test@123$"
+    "email": "king.mana@gmail.com",
+    "password": "Admin@123$"
 }
 
 ### Save auth token

@@ -1,5 +1,5 @@
 import { getSession } from "next-auth/react";
-import { apiUrl } from "../utils/env";
+import { apiUrl } from "@/utils/env";
 
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   const session = await getSession();
@@ -99,6 +99,17 @@ export const deleteArticle = async (id: string) => {
 export const createComment = async (articleId: string, content: string) => {
   return fetchWithAuth(`/articles/${articleId}/comments`, {
     method: "POST",
+    body: JSON.stringify({ content }),
+  });
+};
+
+export const updateComment = async (
+  articleId: string,
+  commentId: string,
+  content: string
+) => {
+  return fetchWithAuth(`/articles/${articleId}/comments/${commentId}`, {
+    method: "PUT",
     body: JSON.stringify({ content }),
   });
 };

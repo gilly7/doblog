@@ -19,6 +19,7 @@ import {
   deleteArticle,
   deleteComment,
   getArticle,
+  updateComment,
 } from "../../lib/api";
 import { Article, Comment } from "@/types";
 import { useSession } from "next-auth/react";
@@ -26,6 +27,7 @@ import { z } from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { cleanContent } from "@/lib/utils";
 
 const commentSchema = z.object({
   content: z.string().min(1, "Content is required"),
@@ -70,11 +72,17 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
     try {
       commentSchema.parse(formData);
 
-      await createComment(id as string, formData.content);
+      if (editingCommentId) {
+        await updateComment(id as string, editingCommentId, formData.content);
+      } else {
+        await createComment(id as string, formData.content);
+      }
+
       const updatedArticle = await getArticle(id as string);
       setArticle(updatedArticle);
       setFormData({ content: "" });
-      //  toast.success("Comment added successfully");
+      setEditingCommentId(null);
+      // toast.success(editingCommentId ? "Comment updated successfully" : "Comment added successfully");
     } catch (err) {
       // toast.error("Failed to create article");
       if (err instanceof z.ZodError) {
@@ -122,7 +130,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
   if (!article) return <div>Loading...</div>;
 
-  const userOwnsArticle = session && article.author.id === session.user?.id;
+  const userOwnsArticle = session && article.author.id === session?.user?.id;
 
   return (
     <Box>
@@ -131,8 +139,9 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
           {article.title}
         </Typography>
         <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-          {new Date(article.createdAt).toLocaleDateString()} | Comments: (
-          {article._count?.comments || 0}) | Category: {article.category.name}
+          {new Date(article.createdAt).toLocaleDateString()} | Author:{" "}
+          {article.author.name} | Comments: ({article._count?.comments || 0}) |
+          Category: {article.category.name}
           {userOwnsArticle && (
             <>
               | <Link href={`/articles/edit/${article.id}`}>Edit</Link>|{" "}
@@ -142,53 +151,58 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
             </>
           )}
         </Typography>
-        <Typography variant="body1" paragraph>
-          {article.content}
-        </Typography>
+        <Box
+          sx={{ mt: 2 }}
+          dangerouslySetInnerHTML={{ __html: cleanContent(article.content) }}
+        />
       </Paper>
 
       <Typography variant="h4" component="h2" gutterBottom>
         Comments
       </Typography>
-      <List>
-        {article.comments?.map((comment) => (
-          <ListItem
-            key={comment.id}
-            secondaryAction={
-              session &&
-              comment.author.id === session.user?.id && (
-                <>
-                  <IconButton
-                    edge="end"
-                    aria-label="edit"
-                    onClick={() => handleEditComment(comment)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    edge="end"
-                    aria-label="delete"
-                    onClick={() => handleDeleteComment(comment.id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </>
-              )
-            }
-          >
-            <ListItemText
-              primary={comment.author?.name}
-              secondary={comment.content}
-            />
-          </ListItem>
-        ))}
-      </List>
+      {article.comments?.length ? (
+        <List>
+          {article.comments?.map((comment) => (
+            <ListItem
+              key={comment.id}
+              secondaryAction={
+                session &&
+                comment.author.id === session.user?.id && (
+                  <>
+                    <IconButton
+                      edge="end"
+                      aria-label="edit"
+                      onClick={() => handleEditComment(comment)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      edge="end"
+                      aria-label="delete"
+                      onClick={() => handleDeleteComment(comment.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </>
+                )
+              }
+            >
+              <ListItemText
+                primary={comment.author?.name}
+                secondary={comment.content}
+              />
+            </ListItem>
+          ))}
+        </List>
+      ) : (
+        <Typography variant="body1">No comments yet</Typography>
+      )}
 
-      {session && (
+      {session ? (
         <>
           <Divider sx={{ my: 3 }} />
           <Typography variant="h5" component="h3" gutterBottom>
-            Add a Comment
+            {editingCommentId ? "Edit Comment" : "Add a Comment"}
           </Typography>
           {generalError && (
             <Alert severity="error" sx={{ mt: 2, width: "100%" }}>
@@ -215,10 +229,29 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
               color="primary"
               disabled={isLoading}
             >
-              {isLoading ? "Submitting..." : "Submit Comment"}
+              {isLoading
+                ? "Submitting..."
+                : editingCommentId
+                ? "Update Comment"
+                : "Submit Comment"}
             </Button>
+            {editingCommentId && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => {
+                  setEditingCommentId(null);
+                  setFormData({ content: "" });
+                }}
+                sx={{ ml: 2 }}
+              >
+                Cancel Edit
+              </Button>
+            )}
           </Box>
         </>
+      ) : (
+        <Typography variant="body1">Please login to add a comment</Typography>
       )}
     </Box>
   );
