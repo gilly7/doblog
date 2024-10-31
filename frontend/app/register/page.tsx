@@ -12,7 +12,6 @@ import {
 import { z } from "zod";
 import { apiUrl } from "@/utils/env";
 import { useRouter } from "next/navigation";
-// import { useSession } from "next-auth/react";
 
 const registerSchema = z
   .object({
@@ -40,7 +39,6 @@ const useRegisterForm = () => {
   const [generalError, setGeneralError] = useState("");
 
   const router = useRouter();
-  // const { data: session } = useSession();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -62,7 +60,6 @@ const useRegisterForm = () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // Authorization: `Bearer ${session?.accessToken}`,
         },
         body: JSON.stringify({
           ...formData,

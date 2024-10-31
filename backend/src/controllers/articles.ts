@@ -74,7 +74,7 @@ export const getArticles = async (c) => {
         where: whereClause,
         include: {
           author: {
-            select: { id: true, name: true, email: true },
+            select: { id: true, name: true },
           },
           category: {
             select: { id: true, name: true },
@@ -116,7 +116,7 @@ export const getArticle = async (c) => {
       where: { id },
       include: {
         author: {
-          select: { name: true, email: true },
+          select: { id: true, name: true },
         },
         category: {
           select: { id: true, name: true },
@@ -124,7 +124,7 @@ export const getArticle = async (c) => {
         comments: {
           include: {
             author: {
-              select: { id: true, name: true, email: true },
+              select: { id: true, name: true },
             },
           },
         },

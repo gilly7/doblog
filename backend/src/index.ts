@@ -25,11 +25,11 @@ app.get("/protected", auth, (c) => {
 });
 
 app.get("/", (c) => {
-  return c.text("Hello from DuBlog!");
+  return c.json({ mssage: "Buckle up and let’s make some magic happen! ✨!" });
 });
 
 app.get("/healthz", (c) => {
-  return c.text("Healthy!");
+  return c.json({ message: "Healthy!" });
 });
 
 const port = 7069;

@@ -18,8 +18,8 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Link from "next/link";
-import { Article, Category } from "./types";
-import { getArticles, getCategories } from "./lib/api";
+import { Article, Category } from "@/types";
+import { getArticles, getCategories } from "@/lib/api";
 
 export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -123,11 +123,12 @@ export default function Home() {
                   color="text.secondary"
                   gutterBottom
                 >
-                  {new Date(article.createdAt).toLocaleDateString()} | Comments:
-                  ({article._count?.comments || 0}) | Category:
+                  {new Date(article.createdAt).toLocaleDateString()} | Author:{" "}
+                  {article.author.name} | Comments: (
+                  {article._count?.comments || 0}) | Category:{" "}
                   {article.category.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2">
                   {truncateContent(article.content)}
                 </Typography>
               </CardContent>

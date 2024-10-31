@@ -16,7 +16,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { z } from "zod";
-import { createArticle, getCategories } from "@/lib/api";
+import { getArticle, getCategories, updateArticle } from "@/lib/api";
 import { Category } from "@/types";
 
 const articleSchema = z.object({
@@ -27,7 +27,7 @@ const articleSchema = z.object({
 
 type ArticleFormData = z.infer<typeof articleSchema>;
 
-const useArticleForm = () => {
+const useArticleForm = (articleId?: string) => {
   const [formData, setFormData] = useState<ArticleFormData>({
     categoryId: "",
     title: "",
@@ -42,7 +42,15 @@ const useArticleForm = () => {
 
   useEffect(() => {
     getCategories().then(setCategories);
-  }, []);
+
+    if (articleId) {
+      getArticle(articleId).then((article) => {
+        setFormData({
+          ...article,
+        });
+      });
+    }
+  }, [articleId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -70,13 +78,12 @@ const useArticleForm = () => {
     try {
       articleSchema.parse(formData);
 
-      const article = await createArticle({
+      await updateArticle(articleId as string, {
         ...formData,
         published: true,
       });
-
-      //  toast.success("Article created successfully");
-      router.push(`/articles/${article.id}`);
+      // toast.success("Article updated successfully");
+      router.push(`/articles/${articleId}`);
     } catch (err) {
       // toast.error("Failed to create article");
       if (err instanceof z.ZodError) {
@@ -102,7 +109,7 @@ const useArticleForm = () => {
   };
 };
 
-export default function NewArticle() {
+export default function UpdateArticle({ params }: { params: { id: string } }) {
   const {
     formData,
     categories,
@@ -112,7 +119,7 @@ export default function NewArticle() {
     handleChange,
     handleCategoryChange,
     handleSubmit,
-  } = useArticleForm();
+  } = useArticleForm(params.id);
 
   return (
     <Box
@@ -125,7 +132,7 @@ export default function NewArticle() {
     >
       <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 900 }}>
         <Typography variant="h4" component="h1" gutterBottom align="center">
-          Add Article
+          Update Article
         </Typography>
         {generalError && (
           <Alert severity="error" sx={{ mt: 2, width: "100%" }}>
@@ -188,7 +195,7 @@ export default function NewArticle() {
             sx={{ mt: 2 }}
             disabled={isLoading}
           >
-            {isLoading ? "Publishing..." : "Publish Article"}
+            {isLoading ? "Saving..." : "Update Article"}
           </Button>
         </Box>
       </Paper>
