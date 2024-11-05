@@ -1,10 +1,11 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import * as bcrypt from "bcryptjs";
+import * as jwt from "jsonwebtoken";
 import prisma from "../db/client";
 import { env } from "../config/env";
 import { JWTPayload } from "../types/index";
+import { Context } from "hono";
 
-export const register = async (c) => {
+export const register = async (c: Context) => {
   try {
     const { name, email, password } = await c.req.json();
 
@@ -30,14 +31,14 @@ export const register = async (c) => {
       message: "User registered successfully",
       userId: user.id,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.log(`failed to register: ${error.message}`);
     c.status(500);
     return c.json({ error: "Internal server error" });
   }
 };
 
-export const login = async (c) => {
+export const login = async (c: Context) => {
   try {
     const { email, password } = await c.req.json();
 
@@ -79,7 +80,7 @@ export const login = async (c) => {
   }
 };
 
-export const me = async (c) => {
+export const me = async (c: Context) => {
   const payload = c.get("jwtPayload") as JWTPayload;
   const user = await prisma.user.findUnique({
     where: { id: payload.userId },
@@ -91,7 +92,7 @@ export const me = async (c) => {
   });
 };
 
-export const logout = async (c) => {
+export const logout = async (c: Context) => {
   try {
     const token = c.req.header("Authorization")?.split(" ")[1];
 
@@ -108,7 +109,7 @@ export const logout = async (c) => {
   }
 };
 
-export const users = async (c) => {
+export const users = async (c: Context) => {
   const users = await prisma.user.findMany({
     select: { id: true, name: true, email: true, createdAt: true },
   });

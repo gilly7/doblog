@@ -60,9 +60,29 @@ Then run the dev server
 npm run dev
 ```
 
+## Frontend
+
+The frontend service is running in [port 7070](http://localhost:7070).
+
+Create a `.env.local` file in the frontend folder with content similar to this:
+
+```sh
+ENV=dev
+API_URL=http://localhost:7069
+AUTH_URL=http://localhost:7070/api/auth
+AUTH_SECRET=xxx # openssl rand -hex 32
+```
+
 ## Backend
 
-The rest API is running on [/api](http://localhost:7069)
+The rest API is running on [port 7069](http://localhost:7069)
+
+create a `.env` file in the backend folder with content similar to this:
+
+```sh
+DATABASE_URL="postgresql://dublog:dublog@localhost:5432/dublog?schema=public"
+JWT_SECRET="xxxx" # openssl rand -hex 32
+```
 
 For db management, prisma is used.
 

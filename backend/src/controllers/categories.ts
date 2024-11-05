@@ -1,7 +1,8 @@
-import prisma from "../db/client";
-import { CategoryInput } from "../types/index";
+import { Context } from "hono";
+import prisma from "../db/client.js";
+import { CategoryInput } from "../types/index.js";
 
-export const createCategory = async (c) => {
+export const createCategory = async (c: Context) => {
   try {
     const { name, description }: CategoryInput = await c.req.json();
 
@@ -29,7 +30,7 @@ export const createCategory = async (c) => {
   }
 };
 
-export const getCategories = async (c) => {
+export const getCategories = async (c: Context) => {
   try {
     const categories = await prisma.category.findMany({
       include: {
@@ -47,7 +48,7 @@ export const getCategories = async (c) => {
   }
 };
 
-export const getCategory = async (c) => {
+export const getCategory = async (c: Context) => {
   try {
     const id = c.req.param("id");
     const category = await prisma.category.findUnique({
@@ -80,7 +81,7 @@ export const getCategory = async (c) => {
   }
 };
 
-export const updateCategory = async (c) => {
+export const updateCategory = async (c: Context) => {
   try {
     const id = c.req.param("id");
     const { name, description }: CategoryInput = await c.req.json();
@@ -107,7 +108,7 @@ export const updateCategory = async (c) => {
   }
 };
 
-export const deleteCategory = async (c) => {
+export const deleteCategory = async (c: Context) => {
   try {
     const id = c.req.param("id");
 

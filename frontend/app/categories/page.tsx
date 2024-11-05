@@ -43,13 +43,15 @@ export default function Home() {
   const filteredCategories = categories.filter(
     (category) =>
       category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      category.description.toLowerCase().includes(searchTerm.toLowerCase())
+      category?.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const displayedCategories = filteredCategories.slice(
     (page - 1) * categoriesPerPage,
     page * categoriesPerPage
   );
+
+  if (!categories) return <div>Loading...</div>;
 
   return (
     <Grid container spacing={4}>
@@ -102,7 +104,7 @@ export default function Home() {
                 color="text.secondary"
                 gutterBottom
               >
-                {category.createdAt}
+                Created At: {category?.createdAt}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {category.description}

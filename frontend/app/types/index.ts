@@ -2,7 +2,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  createdAt?: string;
+  createdAt: string;
 }
 
 export interface Category {
@@ -12,6 +12,7 @@ export interface Category {
   _count?: {
     articles: number;
   };
+  createdAt: string;
 }
 
 export interface Article {

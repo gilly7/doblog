@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import {
@@ -91,7 +91,7 @@ const useLoginForm = () => {
   };
 };
 
-export default function Login() {
+function LoginForm() {
   const {
     formData,
     errors,
@@ -157,5 +157,13 @@ export default function Login() {
         </Box>
       </Paper>
     </Box>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<Box>Loading...</Box>}>
+      <LoginForm />
+    </Suspense>
   );
 }

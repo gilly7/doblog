@@ -195,7 +195,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
           ))}
         </List>
       ) : (
-        <Typography variant="body1">No comments yet</Typography>
+        <Typography variant="body1">No comments yet!</Typography>
       )}
 
       {session ? (
@@ -251,7 +251,9 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
           </Box>
         </>
       ) : (
-        <Typography variant="body1">Please login to add a comment</Typography>
+        <Typography variant="body1">
+          Please <Link href="/login">login</Link> to add a comment
+        </Typography>
       )}
     </Box>
   );

@@ -52,7 +52,7 @@ export const authOptions: NextAuthConfig = {
             ...user,
             accessToken: token,
           };
-        } catch (error: any) {
+        } catch (error) {
           if (error instanceof ZodError) {
             return null;
           }

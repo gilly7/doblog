@@ -49,7 +49,7 @@ export default function Home() {
   useEffect(() => {
     fetchArticles();
     getCategories().then(setCategories);
-  }, []);
+  });
 
   const handleChangePage = (
     event: React.ChangeEvent<unknown>,
@@ -163,11 +163,7 @@ export default function Home() {
             <List>
               {categories.map((category, index) => (
                 <Fragment key={category.id}>
-                  <ListItem
-                    button
-                    component={Link}
-                    href={`/category/${category.id}`}
-                  >
+                  <ListItem component={Link} href={`/category/${category.id}`}>
                     <ListItemText
                       primary={category.name}
                       sx={{ color: "text.primary" }}
