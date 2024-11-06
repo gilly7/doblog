@@ -31,6 +31,11 @@ vault kv put kv/stage/dublog-backend-app-secrets \
     jwt-secret=<secret>
 
 vault kv get kv/stage/dublog-backend-app-secrets
+
+vault kv put kv/stage/dublog-frontend-app-secrets \
+    auth-secret=<secret>
+
+vault kv get kv/stage/dublog-frontend-app-secrets
 ```
 
 Use this to generate a new JWT secret

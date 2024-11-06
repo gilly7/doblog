@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - develop
+      - 15-host-the-app-in-k8s
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"

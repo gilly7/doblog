@@ -58,8 +58,19 @@ autoscaling:
   targetCPUUtilizationPercentage: 75
   targetMemoryUtilizationPercentage: 75
 
+externalSecrets:
+  - name: dublog-frontend-app-secrets
+    refreshInterval: 5m
+    secretStoreRefName: vault-backend
+    targetName: dublog-frontend-app-secrets
+    dataKey: stage/dublog-frontend-app-secrets
+
 env:
   ENV: stage
-  AUTH_SECRET: fb98baee7dab4ca9ae75750008479f368081acd8560858a260b53ca5c46358d8
   API_URL: https://stage-dublog-api.citizix.com
   AUTH_URL: https://stage-dublog.citizix.com/api/auth
+
+secretEnv:
+  DATABASE_URL:
+    name: dublog-frontend-app-secrets
+    AUTH_SECRET: auth-secret
