@@ -6,6 +6,7 @@ import categoryRoutes from "./routes/categories.js";
 import { auth } from "./middleware/auth.js";
 import { logger } from "hono/logger";
 import { cors } from "hono/cors";
+import { env } from "./config/env.js";
 
 const app = new Hono();
 
@@ -29,10 +30,10 @@ app.get("/", (c: Context) => {
 });
 
 app.get("/healthz", (c: Context) => {
-  return c.json({ message: "Healthy!" });
+  return c.json({ message: "Healthy!", app: "backend", env: env.ENV });
 });
 
-const port = 7069;
+const port = Number(env.PORT);
 console.log(`Server is running on port ${port}`);
 
 serve({

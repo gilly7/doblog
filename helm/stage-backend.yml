@@ -1,0 +1,81 @@
+replicaCount: 1
+
+image:
+  repository: ektowett/dublog-backend
+  pullPolicy: IfNotPresent
+  tag: latest
+
+serviceAccount:
+  create: true
+
+livenessProbe:
+  path: /healthz
+  port: 7069
+  initialDelaySeconds: 15
+  periodSeconds: 15
+  timeoutSeconds: 15
+
+readinessProbe:
+  path: /healthz
+  port: 7069
+  initialDelaySeconds: 15
+  periodSeconds: 15
+  timeoutSeconds: 15
+
+containerPort: 7069
+
+service:
+  type: ClusterIP
+  port: 7069
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-issuer
+  hosts:
+    - host: stage-dublog-api.citizix.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: dublog-backend-tls
+      hosts:
+        - stage-dublog-api.citizix.com
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 75
+
+externalSecrets:
+  - name: dublog-backend-app-secrets
+    refreshInterval: 5m
+    secretStoreRefName: vault-backend
+    targetName: dublog-backend-app-secrets
+    dataKey: stage/dublog-backend-app-secrets
+
+env:
+  PORT: "7069"
+  APP_NAME: dublog-backend
+  LOG_LEVEL: info
+  ENV: stage
+  SMTP_PORT: "587"
+
+secretEnv:
+  DATABASE_URL:
+    name: dublog-backend-app-secrets
+    key: db-url
+  JWT_SECRET:
+    name: dublog-backend-app-secrets
+    key: jwt-secret

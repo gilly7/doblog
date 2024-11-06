@@ -1,15 +1,20 @@
-@baseUrl=http://127.0.0.1:7069
+@backendUrl=http://127.0.0.1:7069
+@frontendUrl=http://127.0.0.1:7070
 
 ### Get Home
-GET {{baseUrl}}/ HTTP/1.1
+GET {{backendUrl}}/ HTTP/1.1
 Accept: application/json
 
-### Get Healthz
-GET {{baseUrl}}/healthz HTTP/1.1
+### Get Backend Healthz
+GET {{backendUrl}}/healthz HTTP/1.1
+Accept: application/json
+
+### Get Frontend Healthz
+GET {{frontendUrl}}/api/healthz HTTP/1.1
 Accept: application/json
 
 ### Register user
-POST {{baseUrl}}/auth/register HTTP/1.1
+POST {{backendUrl}}/auth/register HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 
@@ -22,7 +27,7 @@ Accept: application/json
 
 ### Login
 # @name userLogin
-POST {{baseUrl}}/auth/login HTTP/1.1
+POST {{backendUrl}}/auth/login HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 
@@ -35,27 +40,27 @@ Accept: application/json
 @authToken={{userLogin.response.body.token}}
 
 ### Get Users
-GET {{baseUrl}}/auth/users HTTP/1.1
+GET {{backendUrl}}/auth/users HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Me
-GET {{baseUrl}}/auth/me HTTP/1.1
+GET {{backendUrl}}/auth/me HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### logout
-DELETE {{baseUrl}}/auth/logout HTTP/1.1
+DELETE {{backendUrl}}/auth/logout HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Protected
-GET {{baseUrl}}/protected HTTP/1.1
+GET {{backendUrl}}/protected HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Create Article
-POST {{baseUrl}}/articles HTTP/1.1
+POST {{backendUrl}}/articles HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
@@ -66,15 +71,15 @@ Accept: application/json
 }
 
 ### Get Articles
-GET {{baseUrl}}/articles HTTP/1.1
+GET {{backendUrl}}/articles HTTP/1.1
 Accept: application/json
 
 ### Get Article
-GET {{baseUrl}}/articles/8c048069-be0c-4f22-8926-26f82677c97f HTTP/1.1
+GET {{backendUrl}}/articles/8c048069-be0c-4f22-8926-26f82677c97f HTTP/1.1
 Accept: application/json
 
 ### Update Article
-PUT {{baseUrl}}/articles/8c048069-be0c-4f22-8926-26f82677c97f HTTP/1.1
+PUT {{backendUrl}}/articles/8c048069-be0c-4f22-8926-26f82677c97f HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
@@ -84,7 +89,7 @@ Accept: application/json
 }
 
 ### Create Article Comment
-POST {{baseUrl}}/articles/8c048069-be0c-4f22-8926-26f82677c97f/comments HTTP/1.1
+POST {{backendUrl}}/articles/8c048069-be0c-4f22-8926-26f82677c97f/comments HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
@@ -93,12 +98,12 @@ Accept: application/json
 }
 
 ### Create Article Comment
-DELETE {{baseUrl}}/articles/comments/45ffe5a4-d0e5-4fd1-bef4-d0d525b81824 HTTP/1.1
+DELETE {{backendUrl}}/articles/comments/45ffe5a4-d0e5-4fd1-bef4-d0d525b81824 HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Create Category
-POST {{baseUrl}}/categories HTTP/1.1
+POST {{backendUrl}}/categories HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
@@ -108,5 +113,5 @@ Accept: application/json
 }
 
 ### Get Categories
-GET {{baseUrl}}/categories HTTP/1.1
+GET {{backendUrl}}/categories HTTP/1.1
 Accept: application/json

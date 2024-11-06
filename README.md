@@ -124,4 +124,5 @@ Checkout the [client.http](./client.http) file for http requests and their param
 
 ## Deployment
 
-- This will be deployed in a containerized environment. be it docker based or kubernetes based set up
+- This is deployed in a containerized environment, kubernetes.
+- Checkout the [deploying the app](./docs/deploying-the-app.md) guide for more details.
