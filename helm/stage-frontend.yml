@@ -10,23 +10,23 @@ serviceAccount:
 
 livenessProbe:
   path: /api/healthz
-  port: 7070
+  port: 3000
   initialDelaySeconds: 15
   periodSeconds: 15
   timeoutSeconds: 15
 
 readinessProbe:
   path: /api/healthz
-  port: 7070
+  port: 3000
   initialDelaySeconds: 15
   periodSeconds: 15
   timeoutSeconds: 15
 
-containerPort: 7070
+containerPort: 3000
 
 service:
   type: ClusterIP
-  port: 7070
+  port: 3000
 
 ingress:
   enabled: true
@@ -71,6 +71,6 @@ env:
   AUTH_URL: https://stage-dublog.citizix.com/api/auth
 
 secretEnv:
-  DATABASE_URL:
+  AUTH_SECRET:
     name: dublog-frontend-app-secrets
-    AUTH_SECRET: auth-secret
+    key: auth-secret

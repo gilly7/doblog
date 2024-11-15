@@ -1,6 +1,4 @@
-import type { JWTPayload as HonoJWTPayload } from "hono/dist/types/utils/jwt/types";
-
-export interface JWTPayload extends HonoJWTPayload {
+export interface JWTPayload {
   userId: string;
   email: string;
 }
@@ -8,11 +6,6 @@ export interface JWTPayload extends HonoJWTPayload {
 export interface UserData {
   id: string;
   name: string;
-  email: string;
-}
-
-export interface JWTPayload extends HonoJWTPayload {
-  userId: string;
   email: string;
 }
 

@@ -66,11 +66,9 @@ externalSecrets:
     dataKey: stage/dublog-backend-app-secrets
 
 env:
+  ENV: stage
   PORT: "7069"
   APP_NAME: dublog-backend
-  LOG_LEVEL: info
-  ENV: stage
-  SMTP_PORT: "587"
 
 secretEnv:
   DATABASE_URL:

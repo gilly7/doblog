@@ -1,9 +1,9 @@
-import * as bcrypt from "bcryptjs";
-import * as jwt from "jsonwebtoken";
-import prisma from "../db/client";
-import { env } from "../config/env";
-import { JWTPayload } from "../types/index";
+import bcrypt from "bcryptjs";
 import { Context } from "hono";
+import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
+import prisma from "../db/client.js";
+import { JWTPayload } from "../types/index.js";
 
 export const register = async (c: Context) => {
   try {

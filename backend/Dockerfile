@@ -5,10 +5,11 @@ FROM base AS builder
 RUN apk add --no-cache gcompat
 WORKDIR /app
 
-COPY package*json tsconfig.json src ./
+COPY package*json tsconfig.json src prisma ./
 
 RUN npm ci && \
     npm run build && \
+    npx prisma generate && \
     npm prune --production
 
 FROM base AS runner

@@ -129,7 +129,7 @@ export default function Home() {
           onChange={handleChangePage}
           sx={{ mt: 4, display: "flex", justifyContent: "center" }}
           color="primary"
-        />
+        /> 
       </Grid>
       <Grid item xs={12} md={4}>
         <Card sx={{ borderColor: "primary.main" }}>

@@ -1,25 +1,25 @@
 "use client";
 
-import { useEffect, useState, Fragment } from "react";
+import { getArticles, getCategories } from "@/lib/api";
+import { Article, Category } from "@/types";
+import SearchIcon from "@mui/icons-material/Search";
 import {
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
   Button,
+  Card,
+  CardActions,
+  CardContent,
+  Divider,
+  Grid,
+  InputAdornment,
   List,
   ListItem,
   ListItemText,
   Pagination,
-  Divider,
   TextField,
-  InputAdornment,
+  Typography,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import Link from "next/link";
-import { Article, Category } from "@/types";
-import { getArticles, getCategories } from "@/lib/api";
+import { Fragment, useEffect, useState } from "react";
 
 export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -49,7 +49,7 @@ export default function Home() {
   useEffect(() => {
     fetchArticles();
     getCategories().then(setCategories);
-  });
+  }, []);
 
   const handleChangePage = (
     event: React.ChangeEvent<unknown>,
@@ -163,7 +163,10 @@ export default function Home() {
             <List>
               {categories.map((category, index) => (
                 <Fragment key={category.id}>
-                  <ListItem component={Link} href={`/category/${category.id}`}>
+                  <ListItem
+                    component={Link}
+                    href={`/categories/${category.id}`}
+                  >
                     <ListItemText
                       primary={category.name}
                       sx={{ color: "text.primary" }}

@@ -1,4 +1,4 @@
-@backendUrl=http://127.0.0.1:7069
+@backendUrl=http://127.0.0.1:7068
 @frontendUrl=http://127.0.0.1:7070
 
 ### Get Home
@@ -19,8 +19,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-    "name": "Test User",
-    "email": "test@gmail.com",
+    "name": "Test User1",
+    "email": "test1@gmail.com",
     "password": "Test@123$",
     "password_confirm": "Test@123$"
 }
@@ -32,8 +32,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-    "email": "king.mana@gmail.com",
-    "password": "Admin@123$"
+    "email": "test1@gmail.com",
+    "password": "Test@123$"
 }
 
 ### Save auth token
@@ -59,15 +59,30 @@ GET {{backendUrl}}/protected HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
+### Create Category
+POST {{backendUrl}}/categories HTTP/1.1
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+{
+    "name": "Religion",
+    "description": "All about Religion"
+}
+
+### Get Categories
+GET {{backendUrl}}/categories HTTP/1.1
+Accept: application/json
+
+
 ### Create Article
 POST {{backendUrl}}/articles HTTP/1.1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 {
-    "title": "Test Article 8",
-    "content": "Test Article Body eight",
-    "categoryId": "6c410465-dc49-4b4c-bc01-306b3ef12cd8"
+    "title": "Test Article xyz",
+    "content": "Test Article Body damn good",
+    "categoryId": "051ac307-acc7-4e45-93f5-031af5a01b13"
 }
 
 ### Get Articles
@@ -100,18 +115,4 @@ Accept: application/json
 ### Create Article Comment
 DELETE {{backendUrl}}/articles/comments/45ffe5a4-d0e5-4fd1-bef4-d0d525b81824 HTTP/1.1
 Authorization: Bearer {{authToken}}
-Accept: application/json
-
-### Create Category
-POST {{backendUrl}}/categories HTTP/1.1
-Authorization: Bearer {{authToken}}
-Accept: application/json
-
-{
-    "name": "Politics",
-    "description": "All about politics"
-}
-
-### Get Categories
-GET {{backendUrl}}/categories HTTP/1.1
 Accept: application/json
