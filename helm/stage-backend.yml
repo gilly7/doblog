@@ -22,6 +22,18 @@ readinessProbe:
   periodSeconds: 15
   timeoutSeconds: 15
 
+hook:
+  name: db-migrate
+  image:
+    repository: ektowett/dublog-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  commands:
+    - command: prisma migrate deploy
+  ttlSecondsAfterFinished: 0
+  backoffLimit: 2
+  activeDeadlineSeconds: 100
+
 containerPort: 7069
 
 service:
