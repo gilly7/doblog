@@ -1,7 +1,8 @@
-import prisma from "../db/client";
-import { ArticleInput } from "../types/index";
+import { Context } from "hono";
+import prisma from "../db/client.js";
+import { ArticleInput } from "../types/index.js";
 
-export const createArticle = async (c) => {
+export const createArticle = async (c: Context) => {
   try {
     const user = c.get("user");
 
@@ -47,7 +48,7 @@ export const createArticle = async (c) => {
   }
 };
 
-export const getArticles = async (c) => {
+export const getArticles = async (c: Context) => {
   try {
     const page = parseInt(c.req.query("page") || "1", 10);
     const limit = parseInt(c.req.query("limit") || "10", 10);
@@ -109,7 +110,7 @@ export const getArticles = async (c) => {
   }
 };
 
-export const getArticle = async (c) => {
+export const getArticle = async (c: Context) => {
   try {
     const id = c.req.param("id");
     const article = await prisma.article.findUnique({
@@ -144,7 +145,7 @@ export const getArticle = async (c) => {
   }
 };
 
-export const updateArticle = async (c) => {
+export const updateArticle = async (c: Context) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
@@ -199,7 +200,7 @@ export const updateArticle = async (c) => {
   }
 };
 
-export const deleteArticle = async (c) => {
+export const deleteArticle = async (c: Context) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");

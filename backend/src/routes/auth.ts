@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { register, login, me, users, logout } from "../controllers/auth";
-import { auth, validateSession } from "../middleware/auth";
+import { register, login, me, users, logout } from "../controllers/auth.js";
+import { auth, validateSession } from "../middleware/auth.js";
 
 const router = new Hono();
 

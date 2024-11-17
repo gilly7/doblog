@@ -1,13 +1,13 @@
 import { Hono } from "hono";
-import { validateSession } from "../middleware/auth";
+import { validateSession } from "../middleware/auth.js";
 import {
   createArticle,
   getArticles,
   getArticle,
   updateArticle,
   deleteArticle,
-} from "../controllers/articles";
-import { createComment, deleteComment } from "../controllers/comments";
+} from "../controllers/articles.js";
+import { createComment, deleteComment } from "../controllers/comments.js";
 
 const router = new Hono();
 

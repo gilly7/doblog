@@ -1,7 +1,8 @@
-import prisma from "../db/client";
-import { CommentInput, JWTPayload } from "../types/index";
+import { Context } from "hono";
+import prisma from "../db/client.js";
+import { CommentInput, JWTPayload } from "../types/index.js";
 
-export const createComment = async (c) => {
+export const createComment = async (c: Context) => {
   try {
     const articleId = c.req.param("articleId");
     const payload = c.get("jwtPayload") as JWTPayload;
@@ -37,7 +38,7 @@ export const createComment = async (c) => {
   }
 };
 
-export const deleteComment = async (c) => {
+export const deleteComment = async (c: Context) => {
   try {
     const id = c.req.param("id");
     const payload = c.get("jwtPayload") as JWTPayload;

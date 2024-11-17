@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
 import {
   Alert,
-  Typography,
+  Box,
+  Button,
   Paper,
   TextField,
-  Button,
-  Box,
+  Typography,
 } from "@mui/material";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -91,7 +92,7 @@ const useLoginForm = () => {
   };
 };
 
-export default function Login() {
+function LoginForm() {
   const {
     formData,
     errors,
@@ -154,8 +155,19 @@ export default function Login() {
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
+          <Box sx={{ mt: 2 }}>
+            Don&apos;t have an account? <Link href="/register">Register</Link>
+          </Box>
         </Box>
       </Paper>
     </Box>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<Box>Loading...</Box>}>
+      <LoginForm />
+    </Suspense>
   );
 }

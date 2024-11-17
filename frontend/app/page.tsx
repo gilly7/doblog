@@ -1,25 +1,26 @@
 "use client";
 
-import { useEffect, useState, Fragment } from "react";
+import { getArticles, getCategories } from "@/lib/api";
+import { Article, Category } from "@/types";
+import SearchIcon from "@mui/icons-material/Search";
 import {
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
   Button,
+  Card,
+  CardActions,
+  CardContent,
+  Divider,
+  Grid,
+  InputAdornment,
   List,
   ListItem,
   ListItemText,
   Pagination,
-  Divider,
   TextField,
-  InputAdornment,
+  Typography,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Article, Category } from "@/types";
-import { getArticles, getCategories } from "@/lib/api";
+import { Fragment, useEffect, useState } from "react";
 
 export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -28,6 +29,8 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const { data: session } = useSession();
 
   const fetchArticles = async () => {
     setLoading(true);
@@ -106,7 +109,7 @@ export default function Home() {
         </Typography>
         {loading ? (
           <Typography>Loading...</Typography>
-        ) : (
+        ) : articles?.length ? (
           articles.map((article) => (
             <Card key={article.id} sx={{ mb: 4, borderColor: "primary.main" }}>
               <CardContent>
@@ -145,6 +148,19 @@ export default function Home() {
               </CardActions>
             </Card>
           ))
+        ) : (
+          <Typography>
+            No articles found.
+            {session ? (
+              <Typography>
+                <Link href="/articles/new">Add new Article</Link>
+              </Typography>
+            ) : (
+              <Typography>
+                <Link href="/login">Login</Link> to add an article.
+              </Typography>
+            )}
+          </Typography>
         )}
         <Pagination
           count={totalPages}
@@ -160,25 +176,39 @@ export default function Home() {
             <Typography variant="h6" gutterBottom color="primary">
               Categories
             </Typography>
-            <List>
-              {categories.map((category, index) => (
-                <Fragment key={category.id}>
-                  <ListItem
-                    button
-                    component={Link}
-                    href={`/category/${category.id}`}
-                  >
-                    <ListItemText
-                      primary={category.name}
-                      sx={{ color: "text.primary" }}
-                    />
-                  </ListItem>
-                  {index !== categories.length - 1 && (
-                    <Divider sx={{ borderColor: "primary.main" }} />
-                  )}
-                </Fragment>
-              ))}
-            </List>
+            {categories?.length ? (
+              <List>
+                {categories.map((category, index) => (
+                  <Fragment key={category.id}>
+                    <ListItem
+                      component={Link}
+                      href={`/categories/${category.id}`}
+                    >
+                      <ListItemText
+                        primary={category.name}
+                        sx={{ color: "text.primary" }}
+                      />
+                    </ListItem>
+                    {index !== categories.length - 1 && (
+                      <Divider sx={{ borderColor: "primary.main" }} />
+                    )}
+                  </Fragment>
+                ))}
+              </List>
+            ) : (
+              <Typography variant="body1">
+                No categories yet!
+                {session ? (
+                  <Typography>
+                    <Link href="/categories/new">Add new Category</Link>
+                  </Typography>
+                ) : (
+                  <Typography>
+                    <Link href="/login">Login</Link> to add a category.
+                  </Typography>
+                )}
+              </Typography>
+            )}
           </CardContent>
         </Card>
       </Grid>
