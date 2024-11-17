@@ -1,19 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { cleanContent } from "@/lib/utils";
+import { Article, Comment } from "@/types";
+import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import {
   Alert,
-  Typography,
-  Paper,
   Box,
-  Divider,
-  TextField,
   Button,
+  Divider,
+  IconButton,
   List,
   ListItem,
   ListItemText,
-  IconButton,
+  Paper,
+  TextField,
+  Typography,
 } from "@mui/material";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { z } from "zod";
 import {
   createComment,
   deleteArticle,
@@ -21,13 +28,6 @@ import {
   getArticle,
   updateComment,
 } from "../../lib/api";
-import { Article, Comment } from "@/types";
-import { useSession } from "next-auth/react";
-import { z } from "zod";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import { cleanContent } from "@/lib/utils";
 
 const commentSchema = z.object({
   content: z.string().min(1, "Content is required"),

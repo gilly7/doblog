@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
 import {
   Alert,
-  Typography,
+  Box,
+  Button,
   Paper,
   TextField,
-  Button,
-  Box,
+  Typography,
 } from "@mui/material";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -154,6 +155,9 @@ function LoginForm() {
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
+          <Box sx={{ mt: 2 }}>
+            Don&apos;t have an account? <Link href="/register">Register</Link>
+          </Box>
         </Box>
       </Paper>
     </Box>

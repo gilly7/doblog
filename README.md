@@ -92,6 +92,18 @@ npx prisma init
 npx prisma migrate dev --name init
 ```
 
+To deploy the migrations, run
+
+```sh
+npx prisma migrate deploy
+```
+
+In case you want to reset the db, run
+
+```sh
+npx prisma migrate reset
+```
+
 ### Database
 
 The backend stores data in a postgres database. Checkout the [prisma schema](./backend/prisma/schema.prisma) for the db schema.
