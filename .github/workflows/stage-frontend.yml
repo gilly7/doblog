@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - develop
-      - 15-host-the-app-in-k8s
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -46,7 +45,7 @@ jobs:
           build-args: |
             ENV=stage
             API_URL=https://stage-dublog-api.citizix.com
-          tags: ektowett/dublog-frontend:${{ steps.get-image-tag.outputs.image_tag }}
+          tags: ektowett/dublog-frontend:stage-${{ steps.get-image-tag.outputs.image_tag }}
 
       - name: helm template and update argo deploy image
         shell: bash
@@ -56,7 +55,7 @@ jobs:
           helm fetch citizix/app --version 1.0.1 --untar
 
           helm template dublog-frontend ./app \
-            --set image.tag=${{ steps.get-image-tag.outputs.image_tag }} \
+            --set image.tag=stage-${{ steps.get-image-tag.outputs.image_tag }} \
             --namespace=stage \
             -f helm/stage-frontend.yml \
             --output-dir stage/${{ steps.get-image-tag.outputs.image_tag }}

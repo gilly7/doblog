@@ -1,10 +1,11 @@
-name: Deploy stage dublog-backend app using Argo
+name: Deploy prod dublog-backend app using Argo
 
 on:
   workflow_dispatch:
   push:
     branches:
       - develop
+      - 15-setup-prod
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -12,7 +13,7 @@ concurrency:
 
 jobs:
   build-deploy:
-    name: Build and deploy stage dublog-backend
+    name: Build and deploy prod dublog-backend
     runs-on: ubuntu-latest
 
     steps:
@@ -58,11 +59,11 @@ jobs:
           helm template dublog-backend ./app \
             --set image.tag=${{ steps.get-image-tag.outputs.image_tag }} \
             --set hook.image.tag=${{ steps.get-image-tag.outputs.image_tag }} \
-            --namespace=stage \
-            -f helm/stage-backend.yml \
-            --output-dir stage/${{ steps.get-image-tag.outputs.image_tag }}
+            --namespace=prod \
+            -f helm/prod-backend.yml \
+            --output-dir prod/${{ steps.get-image-tag.outputs.image_tag }}
 
-          cd stage/${{ steps.get-image-tag.outputs.image_tag }}
+          cd prod/${{ steps.get-image-tag.outputs.image_tag }}
           cp app/templates/*.yaml .
           rm -rf app
           cd ../../
@@ -73,17 +74,17 @@ jobs:
           cd argo-k8s-releases
           git checkout main
 
-          mkdir -p apps/dublog/backend/stage/${{ steps.get-image-tag.outputs.image_tag }}
-          cp ../stage/${{ steps.get-image-tag.outputs.image_tag }}/* apps/dublog/backend/stage/${{ steps.get-image-tag.outputs.image_tag }}
-          git add apps/dublog/backend/stage/${{ steps.get-image-tag.outputs.image_tag }}
+          mkdir -p apps/dublog/backend/prod/${{ steps.get-image-tag.outputs.image_tag }}
+          cp ../prod/${{ steps.get-image-tag.outputs.image_tag }}/* apps/dublog/backend/prod/${{ steps.get-image-tag.outputs.image_tag }}
+          git add apps/dublog/backend/prod/${{ steps.get-image-tag.outputs.image_tag }}
 
           echo "update argocd application deployment"
-          OLD_PATH=`cat argocd-apps/stage-dublog-backend.yml | grep path | awk '{print $2}'`
+          OLD_PATH=`cat argocd-apps/prod-dublog-backend.yml | grep path | awk '{print $2}'`
           OLD_TAG=`basename $OLD_PATH`
-          sed -i "s/$OLD_TAG/${{ steps.get-image-tag.outputs.image_tag }}/" argocd-apps/stage-dublog-backend.yml
-          git add argocd-apps/stage-dublog-backend.yml
+          sed -i "s/$OLD_TAG/${{ steps.get-image-tag.outputs.image_tag }}/" argocd-apps/prod-dublog-backend.yml
+          git add argocd-apps/prod-dublog-backend.yml
 
-          git commit -m "pushed from $GITHUB_REF update stage dublog-backend ${{ steps.get-image-tag.outputs.image_tag }}"
+          git commit -m "pushed from $GITHUB_REF update prod dublog-backend ${{ steps.get-image-tag.outputs.image_tag }}"
           git push origin main
 
       - name: Notify slack of deploy status

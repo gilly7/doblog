@@ -1,0 +1,76 @@
+replicaCount: 1
+
+image:
+  repository: ektowett/dublog-frontend
+  pullPolicy: IfNotPresent
+  tag: latest
+
+serviceAccount:
+  create: true
+
+livenessProbe:
+  path: /api/healthz
+  port: 3000
+  initialDelaySeconds: 15
+  periodSeconds: 15
+  timeoutSeconds: 15
+
+readinessProbe:
+  path: /api/healthz
+  port: 3000
+  initialDelaySeconds: 15
+  periodSeconds: 15
+  timeoutSeconds: 15
+
+containerPort: 3000
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-issuer
+  hosts:
+    - host: dublog.citizix.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: dublog-tls
+      hosts:
+        - dublog.citizix.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 75
+
+externalSecrets:
+  - name: dublog-frontend-app-secrets
+    refreshInterval: 5m
+    secretStoreRefName: vault-backend
+    targetName: dublog-frontend-app-secrets
+    dataKey: prod/dublog-frontend-app-secrets
+
+env:
+  ENV: prod
+  API_URL: https://dublog-api.citizix.com
+  AUTH_URL: https://dublog.citizix.com/api/auth
+
+secretEnv:
+  AUTH_SECRET:
+    name: dublog-frontend-app-secrets
+    key: auth-secret
