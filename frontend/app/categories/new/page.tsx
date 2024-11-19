@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Alert,
-  Typography,
+  Box,
+  Button,
   Paper,
   TextField,
-  Button,
-  Box,
+  Typography,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { z } from "zod";
 import { createCategory } from "../../lib/api";
 
@@ -57,8 +57,8 @@ const useArticleForm = () => {
       if (err instanceof z.ZodError) {
         setErrors(err.flatten().fieldErrors as Partial<CategoryFormData>);
       } else {
-        setGeneralError("An unexpected error occurred");
-        console.error("Unexpected error:", err);
+        const theMessage = err instanceof Error ? err.message : err;
+        setGeneralError(theMessage);
       }
     } finally {
       setIsLoading(false);
