@@ -1,140 +1,69 @@
-# DoBlog
+# 📝 DoBlog
 
-A simple blogging app
+**DoBlog** is a simple, full-stack blogging application featuring a **Next.js frontend** and a **Hono.js backend**. It aims to mimic real-world application behavior, inspired by the [RealWorld app spec](https://www.realworld.how/implementation-creation/features/).
 
-This app is a nextjs frontend with a honojs backend.
+---
 
-## Feature set
+## ✨ Features
 
-- Similar to real world [app feature set](https://www.realworld.how/implementation-creation/features/)
-- Can register, login and manage users
-- Home page has list of articles (paginated)
-- Optionally list my articles (from me or favourites)
-- While logged in I can comment or favourite on an article
+- 🔐 User registration, login, and profile management
+- 📝 Create, edit, and delete articles
+- 🗂 Paginated article listing on the homepage
+- 💾 View personal articles and favorited articles
+- 💬 Comment on and favorite articles while logged in
 
-## Scope diagram
+---
 
-this diagram depicts initial project entities
+## 📊 Scope Diagram
 
-![project scope](./docs/doblog-features.svg)
+This diagram depicts the initial project entities and their relationships:
 
-## Bootstrapping the app
+![Project Scope](./docs/doblog-features.svg)
 
-Set up the right version of node and npm. Use [nvm](https://github.com/nvm-sh/nvm) for uniformity
+---
+
+## ⚙️ Bootstrapping the App
+
+Ensure you have the correct version of Node.js and npm installed. Use [nvm](https://github.com/nvm-sh/nvm) for consistency:
 
 ```sh
 nvm install v22.10.0 && nvm use v22.10.0
-```
-
-Confirm
-
-```sh
-$ node -v
-
-v22.10.0
-
-$ npm -v
-
-10.9.0
-```
-
-Creating the app
-
-```sh
+node -v   # v22.10.0
+npm -v    # 10.9.0
 npx create-next-app@latest
-```
-
-## Running the app
-
-To run the app locally:
-
-Ensure you have the dependencies installed
-
-```sh
-npm i
-```
-
-Then run the dev server
-
-```sh
+npm install
 npm run dev
-```
-
-## Frontend
-
-The frontend service is running in [port 7070](http://localhost:7070).
-
-Create a `.env.local` file in the frontend folder with content similar to this:
-
-```sh
 ENV=dev
 API_URL=http://localhost:7069
 AUTH_URL=http://localhost:7070/api/auth
-AUTH_SECRET=xxx # openssl rand -hex 32
-```
+AUTH_SECRET=your_auth_secret # openssl rand -hex 32
+DATABASE_URL="postgresql://doblog:doblog@localhost:5432/doblog?schema=public"
+JWT_SECRET=your_jwt_secret # openssl rand -hex 32
+🗃 Database (PostgreSQL + Prisma)
+We use Prisma as the ORM and PostgreSQL as the database.
 
-## Backend
+Common Commands
+Initialize Prisma:
 
-The rest API is running on [port 7069](http://localhost:7069)
-
-create a `.env` file in the backend folder with content similar to this:
-
-```sh
-DATABASE_URL="postgresql://dublog:dublog@localhost:5432/dublog?schema=public"
-JWT_SECRET="xxxx" # openssl rand -hex 32
-```
-
-For db management, prisma is used.
-
-```sh
 npx prisma init
 
+Run development migrations:
+
 npx prisma migrate dev --name init
-```
-
-To deploy the migrations, run
-
-```sh
+Deploy migrations to production:
 npx prisma migrate deploy
-```
+Running Postgres with Docker
+We use Docker Compose to run PostgreSQL:
 
-In case you want to reset the db, run
-
-```sh
-npx prisma migrate reset
-```
-
-### Database
-
-The backend stores data in a postgres database. Checkout the [prisma schema](./backend/prisma/schema.prisma) for the db schema.
-
-We use [docker compose](./compose.yml) for easily managing postgres.
-
-```sh
 docker compose up -d
-```
 
-Or use the Makefile command
+Check the container status:
+make ps
+🔌 API Testing
+You can test the API using the client.http file with the VSCode REST Client extension.
 
-```sh
-make up
-```
+📦 Deployment
+This project is containerized and deployed in a Kubernetes environment.
 
-Inspect
+See deploying-the-app.md for detailed setup instructions.
 
-```sh
-$ make ps
-
-docker compose ps
-NAME                IMAGE                COMMAND                  SERVICE    CREATED       STATUS       PORTS
-doblog-postgres-1   postgres:17-alpine   "docker-entrypoint.s…"   postgres   3 hours ago   Up 3 hours   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp
-```
-
-### Testing and working with the API
-
-Checkout the [client.http](./client.http) file for http requests and their parameters. This works with [vscode rest client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client).
-
-## Deployment
-
-- This is deployed in a containerized environment, kubernetes.
-- Checkout the [deploying the app](./docs/deploying-the-app.md) guide for more details.
