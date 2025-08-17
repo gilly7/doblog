@@ -41,19 +41,24 @@ export const register = async (c: Context) => {
 export const login = async (c: Context) => {
   try {
     const { email, password } = await c.req.json();
+    console.log('Login attempt:', { email, password });
 
     const user = await prisma.user.findUnique({
       where: { email },
     });
+    console.log('User lookup result:', user);
 
     if (!user) {
       c.status(401);
+      console.log('Login failed: user not found');
       return c.json({ error: "Invalid credentials" });
     }
 
     const isValid = await bcrypt.compare(password, user.password);
+    console.log('Password valid:', isValid);
     if (!isValid) {
       c.status(401);
+      console.log('Login failed: invalid password');
       return c.json({ error: "Invalid credentials" });
     }
 
@@ -72,6 +77,7 @@ export const login = async (c: Context) => {
       },
     });
 
+    console.log('Login successful:', { userId: user.id });
     return c.json({ token, user });
   } catch (error: any) {
     console.error(`failed to log in: ${error.message}`);

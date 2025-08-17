@@ -1,3 +1,63 @@
+// --- FAVORITES FEATURE ---
+
+export const favoriteArticle = async (c: Context) => {
+  try {
+    const user = c.get("user");
+    const articleId = c.req.param("id");
+    if (!user) {
+      c.status(401);
+      return c.json({ error: "Unauthorized" });
+    }
+    const article = await prisma.article.update({
+      where: { id: articleId },
+      data: { favoritedBy: { connect: { id: user.id } } },
+      include: { favoritedBy: true },
+    });
+    return c.json(article);
+  } catch (error: any) {
+    c.status(500);
+    return c.json({ error: "Internal server error" });
+  }
+};
+
+export const unfavoriteArticle = async (c: Context) => {
+  try {
+    const user = c.get("user");
+    const articleId = c.req.param("id");
+    if (!user) {
+      c.status(401);
+      return c.json({ error: "Unauthorized" });
+    }
+    const article = await prisma.article.update({
+      where: { id: articleId },
+      data: { favoritedBy: { disconnect: { id: user.id } } },
+      include: { favoritedBy: true },
+    });
+    return c.json(article);
+  } catch (error: any) {
+    c.status(500);
+    return c.json({ error: "Internal server error" });
+  }
+};
+
+export const getUserFavorites = async (c: Context) => {
+  try {
+    const user = c.get("user");
+    if (!user) {
+      c.status(401);
+      return c.json({ error: "Unauthorized" });
+    }
+    const userWithFavorites = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: { favorites: true },
+    });
+    return c.json(userWithFavorites?.favorites || []);
+  } catch (error: any) {
+    c.status(500);
+    return c.json({ error: "Internal server error" });
+  }
+};
+// --- END FAVORITES FEATURE ---
 import { Context } from "hono";
 import prisma from "../db/client.js";
 import { ArticleInput } from "../types/index.js";
@@ -80,8 +140,11 @@ export const getArticles = async (c: Context) => {
           category: {
             select: { id: true, name: true },
           },
+          favoritedBy: {
+            select: { id: true },
+          },
           _count: {
-            select: { comments: true },
+            select: { comments: true, favoritedBy: true },
           },
         },
         skip,

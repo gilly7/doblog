@@ -1,7 +1,12 @@
 "use client";
 
-import { getArticles, getCategories } from "@/lib/api";
+import { getArticles, getCategories, favoriteArticle, unfavoriteArticle, getUserFavorites } from "@/lib/api";
 import { Article, Category } from "@/types";
+import { useSession } from "next-auth/react";
+import { useEffect, useState, Fragment } from "react";
+import Link from "next/link";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Button,
@@ -16,12 +21,8 @@ import {
   ListItemText,
   Pagination,
   TextField,
-  Typography,
+  Typography
 } from "@mui/material";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { Fragment, useEffect, useState } from "react";
-
 export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -29,7 +30,8 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+  const [favoriteArticles, setFavoriteArticles] = useState<Article[]>([]);
   const { data: session } = useSession();
 
   const fetchArticles = async () => {
@@ -54,6 +56,46 @@ export default function Home() {
     getCategories().then(setCategories);
   }, []);
 
+  useEffect(() => {
+    if (session && session.user) {
+      getUserFavorites()
+        .then((favorites) => {
+          setFavoriteIds(new Set(favorites.map((a: Article) => a.id)));
+          setFavoriteArticles(favorites);
+        })
+        .catch(() => {
+          setFavoriteArticles([]);
+        });
+    } else {
+      setFavoriteIds(new Set());
+      setFavoriteArticles([]);
+    }
+  }, [session]);
+
+  const handleFavorite = async (id: string, isFav: boolean) => {
+    if (!session) return;
+    setFavoriteIds((prev) => {
+      const newSet = new Set(prev);
+      if (isFav) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+    try {
+      if (isFav) await unfavoriteArticle(id);
+      else await favoriteArticle(id);
+      // Refresh articles to update favorite count
+      fetchArticles();
+    } catch (e) {
+      // revert on error
+      setFavoriteIds((prev) => {
+        const newSet = new Set(prev);
+        if (isFav) newSet.add(id);
+        else newSet.delete(id);
+        return newSet;
+      });
+    }
+  };
+
   const handleChangePage = (
     event: React.ChangeEvent<unknown>,
     value: number
@@ -62,7 +104,6 @@ export default function Home() {
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(`searching ${event.target.value}`);
     setSearchTerm(event.target.value);
     setPage(1);
   };
@@ -110,57 +151,64 @@ export default function Home() {
         {loading ? (
           <Typography>Loading...</Typography>
         ) : articles?.length ? (
-          articles.map((article) => (
-            <Card key={article.id} sx={{ mb: 4, borderColor: "primary.main" }}>
-              <CardContent>
-                <Typography
-                  variant="h5"
-                  component="div"
-                  gutterBottom
-                  color="primary"
-                >
-                  {article.title}
-                </Typography>
-                <Typography
-                  variant="subtitle2"
-                  color="text.secondary"
-                  gutterBottom
-                >
-                  {new Date(article.createdAt).toLocaleDateString()} | Author:{" "}
-                  {article.author.name} | Comments: (
-                  {article._count?.comments || 0}) | Category:{" "}
-                  {article.category.name}
-                </Typography>
-                <Typography variant="body2">
-                  {truncateContent(article.content)}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  size="small"
-                  component={Link}
-                  href={`/articles/${article.id}`}
-                  variant="outlined"
-                  color="primary"
-                >
-                  Read More
-                </Button>
-              </CardActions>
-            </Card>
-          ))
+          articles.map((article) => {
+            const isFav = favoriteIds.has(article.id);
+            return (
+              <Card key={article.id} sx={{ mb: 4, borderColor: "primary.main" }}>
+                <CardContent>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    gutterBottom
+                    color="primary"
+                  >
+                    {article.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {truncateContent(article.content)}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    component={Link}
+                    href={`/articles/${article.id}`}
+                    size="small"
+                    color="primary"
+                  >
+                    Read More
+                  </Button>
+                  {session && (
+                    <Button
+                      size="small"
+                      color={isFav ? "error" : "primary"}
+                      startIcon={isFav ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                      onClick={() => handleFavorite(article.id, isFav)}
+                    >
+                      {isFav ? "Unfavorite" : "Favorite"}
+                    </Button>
+                  )}
+                  <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                    {article.favoritedBy?.length ?? 0} favorites
+                  </Typography>
+                </CardActions>
+              </Card>
+            );
+          })
         ) : (
-          <Typography>
-            No articles found.
+          <>
+            <Typography>
+              No articles found.
+            </Typography>
             {session ? (
-              <Typography>
+              <span>
                 <Link href="/articles/new">Add new Article</Link>
-              </Typography>
+              </span>
             ) : (
-              <Typography>
+              <span>
                 <Link href="/login">Login</Link> to add an article.
-              </Typography>
+              </span>
             )}
-          </Typography>
+          </>
         )}
         <Pagination
           count={totalPages}
@@ -171,7 +219,7 @@ export default function Home() {
         />
       </Grid>
       <Grid item xs={12} md={4}>
-        <Card sx={{ borderColor: "primary.main" }}>
+        <Card sx={{ borderColor: "primary.main", mb: 4 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom color="primary">
               Categories
@@ -196,21 +244,46 @@ export default function Home() {
                 ))}
               </List>
             ) : (
-              <Typography variant="body1">
-                No categories yet!
+              <>
+                <Typography variant="body1">
+                  No categories yet!
+                </Typography>
                 {session ? (
-                  <Typography>
+                  <span>
                     <Link href="/categories/new">Add new Category</Link>
-                  </Typography>
+                  </span>
                 ) : (
-                  <Typography>
+                  <span>
                     <Link href="/login">Login</Link> to add a category.
-                  </Typography>
+                  </span>
                 )}
-              </Typography>
+              </>
             )}
           </CardContent>
         </Card>
+        {session && favoriteArticles.length > 0 && (
+          <Card sx={{ borderColor: "primary.main" }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom color="primary">
+                Your Favorited Articles
+              </Typography>
+              <List>
+                {favoriteArticles.map((article) => (
+                  <ListItem
+                    key={article.id}
+                    component={Link}
+                    href={`/articles/${article.id}`}
+                  >
+                    <ListItemText
+                      primary={article.title}
+                      secondary={truncateContent(article.content, 60)}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
+        )}
       </Grid>
     </Grid>
   );

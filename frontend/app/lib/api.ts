@@ -1,3 +1,20 @@
+// --- FAVORITES FEATURE ---
+export async function favoriteArticle(id: string) {
+  return fetchWithAuth(`/articles/${id}/favorite`, {
+    method: "POST",
+  });
+}
+
+export async function unfavoriteArticle(id: string) {
+  return fetchWithAuth(`/articles/${id}/favorite`, {
+    method: "DELETE",
+  });
+}
+
+export async function getUserFavorites() {
+  return fetchWithAuth("/articles/favorites/me");
+}
+// --- END FAVORITES FEATURE ---
 import { getSession } from "next-auth/react";
 import { apiUrl } from "@/utils/env";
 
