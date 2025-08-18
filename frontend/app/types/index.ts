@@ -33,6 +33,7 @@ export interface Article {
     comments: number;
   };
   comments?: Comment[];
+  favoritedBy?: User[];
 }
 
 export interface Comment {
@@ -54,5 +55,6 @@ export interface AuthStore {
   user: User | null;
   setToken: (token: string | null) => void;
   setUser: (user: User | null) => void;
-  logout: () => void;
+  favoritedBy?: User[];
+  favoriteCount?: number;
 }

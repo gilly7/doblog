@@ -11,7 +11,10 @@ import categoryRoutes from "./routes/categories.js";
 const app = new Hono();
 
 app.use("*", logger());
-app.use("*", cors());
+app.use("*", cors({
+  origin: "http://localhost:7070",
+  credentials: true,
+}));
 
 app.route("/auth", authRoutes);
 app.route("/articles", articleRoutes);
