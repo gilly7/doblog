@@ -1,5 +1,5 @@
-@backendUrl=http://127.0.0.1:7068
-@backendUrl=https://stage-dublog-api.citizix.com
+@backendUrl=http://127.0.0.1:7069
+# @backendUrl=https://stage-dublog-api.citizix.com
 @frontendUrl=http://127.0.0.1:7070
 
 ### Get Home
